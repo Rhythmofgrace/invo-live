@@ -3,8 +3,8 @@
   "reset_epoch": 1794538500,
   "initial_seed_usdt": 106.55,
   "initial_seed_inr": 10000.0,
-  "last_update_ist": "2026-11-14 10:28:42 PM IST",
-  "last_update_epoch": 1794675522.6313405,
+  "last_update_ist": "2026-11-14 10:28:47 PM IST",
+  "last_update_epoch": 1794675527.8921127,
   "last_rebalance_epoch": 1794538529.1567123,
   "total_portfolio_equity": 111.82024698358511,
   "total_active_trading_capital": 94.20142446991736,
@@ -748,15 +748,6 @@
   ],
   "notifications": [
     {
-      "id": "notif_1794620980954",
-      "time_ist": "2026-11-14 07:19:40 AM IST",
-      "time_short": "Nov 14, 07:19 AM IST",
-      "epoch": 1794620980.9553359,
-      "title": "\ud83c\udfaf TP Sync: @ka5h BERA",
-      "message": "Take Profit updated to $0.0997",
-      "level": "info"
-    },
-    {
       "id": "notif_1794628133464",
       "time_ist": "2026-11-14 09:18:53 AM IST",
       "time_short": "Nov 14, 09:18 AM IST",
@@ -926,6 +917,15 @@
       "title": "\ud83c\udfc1 Exit: @inquisitor SOPHUSDT (Invo Trader Closed)",
       "message": "+$5.52 (+35.2%) | $0.0023 \u2794 $0.0021 | 30% Tax: +$1.66",
       "level": "success"
+    },
+    {
+      "id": "notif_1794675527891",
+      "time_ist": "2026-11-14 10:28:47 PM IST",
+      "time_short": "Nov 14, 10:28 PM IST",
+      "epoch": 1794675527.8920085,
+      "title": "\ud83d\ude80 Entry: @inquisitor BTCUSDT (SHORT 3x)",
+      "message": "Filled @ $65,412.7000 | Margin: $9.59 | Order: 28679990388",
+      "level": "info"
     }
   ],
   "wispbyte_close_epoch": 0.0
