@@ -3,11 +3,11 @@
   "reset_epoch": 1794538500,
   "initial_seed_usdt": 106.55,
   "initial_seed_inr": 10000.0,
-  "last_update_ist": "2026-11-14 10:25:27 PM IST",
-  "last_update_epoch": 1794675327.508798,
+  "last_update_ist": "2026-11-14 10:28:42 PM IST",
+  "last_update_epoch": 1794675522.6313405,
   "last_rebalance_epoch": 1794538529.1567123,
   "total_portfolio_equity": 111.82024698358511,
-  "total_active_trading_capital": 103.79066556198008,
+  "total_active_trading_capital": 94.20142446991736,
   "tax_vault_usdt": 8.02958142160503,
   "tax_vault_inr": 757.1092322431383,
   "usdt_inr_rate": 94.29,
@@ -15,14 +15,34 @@
     "limpan96": 26.6375,
     "akira": 13.429174227174125,
     "prateek": 17.758333333333333,
-    "inquisitor": 21.309424649028262,
+    "inquisitor": 11.720183556965544,
     "ka5h": 24.65623335244436
   },
   "active_positions": {
     "akira": [],
     "nicush": [],
     "ka5h": [],
-    "inquisitor": [],
+    "inquisitor": [
+      {
+        "ticker": "XTEN",
+        "pair": "BTCUSDT",
+        "direction": "SHORT",
+        "leverage": 3.0,
+        "allocated_margin_usdt": 9.589241092062718,
+        "untraded_cash_usdt": 11.720183556965544,
+        "executed_qty": 0.00043980955788055484,
+        "entry_price": 65412.7,
+        "entry_order_id": "28679990388",
+        "entry_epoch": 1794675522.6311743,
+        "entry_ist": "2026-11-14 10:28:42 PM IST",
+        "sl_floor_price": 83946.29833333332,
+        "trader_sl_price": null,
+        "trader_tp_price": null,
+        "invo_entry_size": 1.4996918715572085,
+        "invo_entry_price": 0.21243,
+        "loans": []
+      }
+    ],
     "lazylegendx": []
   },
   "stats": {
