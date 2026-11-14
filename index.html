@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Invo Pool 5 • Binance Live Execution Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  padding: clamp(10px, 2vw, 24px);
+  background: #eaedf1;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #111827;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+* { box-sizing: border-box; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.badge-green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.badge-dark { background: #111827; color: #ffffff; }
+.badge-amber { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.badge-blue { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+.badge-rose { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+  white-space: nowrap !important;
+}
+th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap !important;
+}
+tr:hover td { background: #f8fafc; }
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 900px) {
+  .bento-grid { grid-template-columns: 1fr !important; }
+}
+
+.col-time {
+  white-space: nowrap !important;
+  min-width: 125px;
+}
+.col-reason {
+  white-space: nowrap !important;
+  min-width: 140px;
+}
+
+</style>
+</head>
+<body>
+
+<div style="background:#eaedf1; padding:clamp(16px, 3vw, 28px); border-radius:28px; width:100%; max-width:1240px; margin:0 auto;">
+
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
+    <div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+        <span class="badge badge-dark">POOL 5</span>
+      </div>
+      <h1 style="font-size:clamp(22px, 3vw, 30px); font-weight:800; color:#111827; margin:0; letter-spacing:-0.5px;">
+        Live Execution & Tax Vault Dashboard
+      </h1>
+      <div style="font-size:13px; color:#6b7280; margin-top:4px; font-weight:500;">
+        Binance USDT-M Futures
+      </div>
+    </div>
+
+    <!-- Status & Last Update -->
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <a href="concurrency_experiment_case_study.html" target="_blank" style="background:#e0e7ff; color:#3730a3; border-radius:30px; padding:8px 16px; font-size:12px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+        📊 Concurrency Case Study (+217%)
+      </a>
+      <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:30px; padding:8px 16px; font-size:12px; font-weight:700; color:#374151; box-shadow:0 2px 6px rgba(0,0,0,0.02);" id="lastUpdateBadge">
+        Syncing...
+      </div>
+    </div>
+  </div>
+
+  <!-- Bento Grid -->
+  <div class="bento-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:20px;">
+    
+    <!-- Bento 1: Overall Capital & Tax Vault (Signature Dark Card) -->
+    <div style="background:#141518; color:#ffffff; border-radius:26px; padding:clamp(18px, 3vw, 24px); box-shadow:0 12px 32px rgba(20,21,24,0.12); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <span style="font-size:14px; font-weight:700; color:#e5e7eb;">Total Portfolio Wealth</span>
+          <span class="badge" style="background:#26282e; color:#34d399;" id="statusPill">Binance Connected</span>
+        </div>
+        <div style="margin-bottom:20px;">
+          <div style="display:flex; align-items:baseline; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:clamp(30px, 4vw, 38px); font-weight:800; letter-spacing:-1px; line-height:1.1; color:#ffffff;" id="totalWealth">
+              $10,000.00
+            </div>
+            <div id="portfolioNetPnlBadge" style="font-size:14px; font-weight:700; padding:3px 9px; border-radius:8px; background:rgba(16,185,129,0.15); color:#34d399; display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+              +$0.00 (+0.00%)
+            </div>
+          </div>
+          <div style="font-size:12px; color:#9ca3af; margin-top:6px; font-weight:500;" id="totalWealthInr">
+            Equivalent: ₹8.40 Lakh INR
+          </div>
+          <div style="font-size:11px; color:#60a5fa; margin-top:4px; font-weight:600; display:flex; align-items:center; gap:4px;" id="initialSeedBadge">
+            🌱 Started: $106.55 (₹10,000 INR)
+          </div>
+        </div>
+      </div>
+
+      <!-- Internal Stats Pill Grid -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="background:#ffffff; color:#111827; border-radius:18px; padding:12px 10px; text-align:center;">
+          <div style="font-size:18px; font-weight:800; color:#2563eb;" id="activeCapital">$10,000.00</div>
+          <div style="font-size:10px; font-weight:600; color:#6b7280; margin-top:2px;">Active Trading Capital</div>
+        </div>
+        <div style="background:#ffffff; color:#111827; border-radius:18px; padding:12px 10px; text-align:center;">
+          <div style="font-size:18px; font-weight:800; color:#dc2626;" id="taxVaultCash">$0.00</div>
+          <div style="font-size:10px; font-weight:600; color:#6b7280; margin-top:2px;">Safe 30% Tax Vault</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bento 2: Subgroup Capital Distribution (White Card) -->
+    <div style="background:#ffffff; border-radius:26px; padding:clamp(18px, 3vw, 24px); box-shadow:0 10px 30px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:14px; font-weight:700; color:#111827;">3-2 Equalizer Allocation</span>
+          <span class="badge badge-blue">50/50 Subgroups</span>
+        </div>
+        <div style="font-size:12px; color:#6b7280; line-height:1.4; margin-bottom:12px;">
+          Capital is divided 50% to high-velocity scalpers and 50% to macro/swing traders with weekly auto-equalization.
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:14px; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+          <span style="color:#64748b;">Group A (Scalpers):</span>
+          <span style="font-weight:700; color:#111827;" id="grpATotal">$5,000.00 (50.0%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#9ca3af; margin-bottom:10px;">
+          <span>@inquisitor & @lazylegendx</span>
+          <span id="grpAPer">$2,500.00 each</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+          <span style="color:#64748b;">Group B (Swing / Macro):</span>
+          <span style="font-weight:700; color:#111827;" id="grpBTotal">$5,000.00 (50.0%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#9ca3af;">
+          <span>@akira, @nicush, @ka5h</span>
+          <span id="grpBPer">$1,666.67 each</span>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#9ca3af; font-weight:600; border-top:1px solid #f3f4f6; padding-top:10px;">
+        <span>Margin Sizing Cap: <b style="color:#111827;">₹10 Lakh ($11.9k)</b></span>
+        <span>SL Floor: <b style="color:#dc2626;">-85%</b></span>
+      </div>
+    </div>
+
+    <!-- Bento 3: Risk Controls & Safeguards (White Card) -->
+    <div style="background:#ffffff; border-radius:26px; padding:clamp(18px, 3vw, 24px); box-shadow:0 10px 30px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:14px; font-weight:700; color:#111827;">Live Safeguards</span>
+          <span class="badge badge-green">Zero Default Risk</span>
+        </div>
+        <div style="font-size:12px; color:#6b7280; line-height:1.4; margin-bottom:12px;">
+          All winning trades skim 30% into the cash vault. Real Binance orders execute live with strict limits.
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:10px; text-align:center;">
+          <div style="font-size:16px; font-weight:800; color:#111827;">4 Hours</div>
+          <div style="font-size:10px; color:#6b7280; font-weight:600; margin-top:2px;">Strict Time Exit</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:10px; text-align:center;">
+          <div style="font-size:16px; font-weight:800; color:#10b981;">30%</div>
+          <div style="font-size:10px; color:#6b7280; font-weight:600; margin-top:2px;">Safe Tax Skim</div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#f9fafb; border-radius:16px; padding:10px 14px; font-size:11px;">
+        <span style="color:#6b7280; font-weight:600;">Subgroup Rescue</span>
+        <span style="color:#111827; font-weight:700;">Recapitalizes if &lt; $10</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Active Positions Table -->
+  <div style="background:#ffffff; border-radius:26px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.03); margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h3 style="font-size:16px; font-weight:800; color:#111827; margin:0;">
+          ⚡ Live Active Positions (Binance Testnet)
+        </h3>
+        <p style="color:#6b7280; font-size:12px; margin:4px 0 0 0;">
+          Real open positions currently holding on the Binance Testnet orderbook.
+        </p>
+      </div>
+      <span class="badge badge-dark" id="openCountBadge">0 Open</span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Trader</th>
+            <th>Symbol</th>
+            <th>Side</th>
+            <th>Margin Invested</th>
+            <th>Qty</th>
+            <th>Entry Price</th>
+            <th>Entry Time</th>
+            <th>Holding Time</th>
+            <th>Stop-Loss Floor</th>
+            <th>Binance Order ID</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="openPositionsBody">
+          <tr><td colspan="11" style="text-align:center; color:#9ca3af; padding:20px;">No open positions right now. Listening for signals...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5 Traders Subaccounts Table -->
+  <div style="background:#ffffff; border-radius:26px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.03); margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h3 style="font-size:16px; font-weight:800; color:#111827; margin:0;">
+          👥 5-Trader Subaccount Balances
+        </h3>
+        <p style="color:#6b7280; font-size:12px; margin:4px 0 0 0;">
+          Active trading balances compounding with 70% of realized gains.
+        </p>
+      </div>
+      <span class="badge badge-blue">Pool 5 Subaccounts</span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Trader</th>
+            <th>Subgroup</th>
+            <th>Active USDT Balance</th>
+            <th>INR Value</th>
+            <th>Trades</th>
+            <th>Wins / Losses</th>
+            <th>Net Realized PnL (% / $)</th>
+            <th>Tax Skimmed into Vault</th>
+          </tr>
+        </thead>
+        <tbody id="tradersBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Trade History & Tax Skims -->
+  <div style="background:#ffffff; border-radius:26px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.03);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h3 style="font-size:16px; font-weight:800; color:#111827; margin:0;">
+          📜 Live Trade Execution Ledger
+        </h3>
+        <p style="color:#6b7280; font-size:12px; margin:4px 0 0 0;">
+          Real-time trade exits with verified Binance fills, tax vault ring-fences, and audit logs.
+        </p>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button onclick="downloadTradesCSV()" style="cursor:pointer; background:#111827; color:#ffffff; border:none; border-radius:12px; padding:7px 14px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1); transition:transform 0.1s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+          📥 Download Trades (CSV / Excel)
+        </button>
+        <button onclick="downloadTradesJSON()" style="cursor:pointer; background:#ffffff; color:#374151; border:1px solid #d1d5db; border-radius:12px; padding:6px 12px; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+          📄 Export JSON
+        </button>
+        <a href="trades.csv" download="trades.csv" style="cursor:pointer; background:#f3f4f6; color:#4b5563; border-radius:12px; padding:6px 10px; font-size:11px; font-weight:600; text-decoration:none;">
+          Raw CSV
+        </a>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto; max-height:400px;">
+      <table>
+        <thead style="position:sticky; top:0; z-index:10;">
+          <tr>
+            <th class="col-time">Time (IST)</th>
+            <th>Trader</th>
+            <th>Pair</th>
+            <th>Margin</th>
+            <th>Entry Price</th>
+            <th>Exit Price</th>
+            <th>Net PnL (% / $)</th>
+            <th style="color:#dc2626;">30% Tax Skim</th>
+            <th class="col-reason">Exit Reason</th>
+          </tr>
+        </thead>
+        <tbody id="tradeHistoryBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let USDT_INR = 93.85; // Live exchange rate, dynamically updated from Forex feed
+const livePrices = {};
+
+async function fetchLiveInrRate() {
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
+    if (r.ok) {
+      const data = await r.json();
+      if (data && data.rates && data.rates.INR) {
+        USDT_INR = parseFloat(data.rates.INR);
+      }
+    }
+  } catch (e) {
+    try {
+      const r2 = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      if (r2.ok) {
+        const d2 = await r2.json();
+        if (d2 && d2.rates && d2.rates.INR) {
+          USDT_INR = parseFloat(d2.rates.INR);
+        }
+      }
+    } catch (e2) {}
+  }
+}
+fetchLiveInrRate();
+setInterval(fetchLiveInrRate, 300000);
+
+function getTraderDisplayName(u) {
+  if (!u) return '@trader';
+  const clean = String(u).replace(/^@/, '').toLowerCase().trim();
+  if (clean === 'booobsas' || clean === 'inquisitor') return '@inquisitor';
+  if (clean === 'henderson_14' || clean === 'ka5h') return '@ka5h';
+  return '@' + clean;
+}
+
+function formatShortTime(tStr) {
+  if (!tStr) return '--';
+  tStr = String(tStr).trim();
+
+  // Format 1: "2026-11-12 10:53:02 PM IST" or "2026-11-12 10:53:02 PM"
+  const m1 = tStr.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})(?::\d{2})?\s+(AM|PM)/i);
+  if (m1) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const month = months[parseInt(m1[2], 10) - 1] || m1[2];
+    const day = parseInt(m1[3], 10);
+    return `${day} ${month}, ${m1[4]}:${m1[5]} ${m1[6].toUpperCase()}`;
+  }
+
+  // Format 2: ISO "2026-11-12 22:53:02" or "2026-11-12T22:53:02" (24-hour)
+  const m2 = tStr.match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{1,2}):(\d{2})/i);
+  if (m2) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const month = months[parseInt(m2[2], 10) - 1] || m2[2];
+    const day = parseInt(m2[3], 10);
+    let hr = parseInt(m2[4], 10);
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    hr = hr % 12 || 12;
+    const hrStr = hr < 10 ? '0' + hr : '' + hr;
+    return `${day} ${month}, ${hrStr}:${m2[5]} ${ampm}`;
+  }
+
+  return tStr.replace(/:\d{2}(\s+[AP]M)/i, '$1').replace(/\s+IST/i, '');
+}
+
+function formatHoldingDuration(entryEpoch, entryIstStr) {
+  let epoch = Number(entryEpoch);
+  if (!epoch || isNaN(epoch)) {
+    if (entryIstStr) {
+      const parsed = Date.parse(entryIstStr.replace(' IST', ''));
+      if (parsed) epoch = parsed / 1000;
+    }
+  }
+  if (!epoch || isNaN(epoch)) return '--';
+  const nowSec = Math.floor(Date.now() / 1000);
+  const diffSec = Math.max(0, nowSec - epoch);
+  const totalMin = Math.floor(diffSec / 60);
+  const hrs = Math.floor(totalMin / 60);
+  const mins = totalMin % 60;
+  if (hrs === 0) return `${mins}m`;
+  return `${hrs}h ${mins}m`;
+}
+
+async function updateLiveTickerPrices(symbols) {
+  for (const sym of symbols) {
+    try {
+      const r = await fetch('https://fapi.binance.com/fapi/v1/ticker/price?symbol=' + sym);
+      if (r.ok) {
+        const j = await r.json();
+        if (j && j.price) livePrices[sym] = parseFloat(j.price);
+      }
+    } catch (e) {}
+  }
+}
+
+function fmtUsdt(v) {
+  if (v === null || v === undefined) return '$0.00';
+  return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtInr(v) {
+  if (v === null || v === undefined) return '₹0';
+  const inr = Number(v) * USDT_INR;
+  if (Math.abs(inr) >= 10000000) return '₹' + (inr / 10000000).toFixed(2) + ' Cr';
+  if (Math.abs(inr) >= 100000) return '₹' + (inr / 100000).toFixed(2) + ' Lakh';
+  return '₹' + Math.round(inr).toLocaleString('en-IN');
+}
+
+let lastKnownState = null;
+
+async function fetchStats() {
+  try {
+    let data = null;
+    // 1. Primary: Load with aggressive cache-busting headers
+    try {
+      const res = await fetch('binance_live_state.json?_nocache=' + Date.now(), {
+        cache: 'no-store',
+        headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+      });
+      if (res.ok) {
+        data = await res.json();
+      }
+    } catch (e1) {}
+
+    // 2. Fallback: If GitHub Pages CDN served a stale file or failed, try direct raw GitHub
+    if (!data) {
+      const resRaw = await fetch('https://raw.githubusercontent.com/Rhythmofgrace/invo-live/refs/heads/main/binance_live_state.json?_nocache=' + Date.now(), {
+        cache: 'no-store'
+      });
+      if (resRaw.ok) {
+        data = await resRaw.json();
+      }
+    }
+
+    if (!data) throw new Error('Could not load state from any endpoint');
+    lastKnownState = data;
+    renderDashboard(data);
+  } catch (e) {
+    if (lastKnownState) {
+      renderDashboard(lastKnownState);
+    } else {
+      document.getElementById('lastUpdateBadge').innerText = 'Offline / Standby';
+    }
+  }
+}
+
+function renderDashboard(data) {
+  if (data.usdt_inr_rate && Number(data.usdt_inr_rate) > 50) {
+    USDT_INR = Number(data.usdt_inr_rate);
+  }
+  const totEq = data.total_portfolio_equity || 0;
+  const actCap = data.total_active_trading_capital || 0;
+  const vaultUsdt = data.tax_vault_usdt || 0;
+  const initSeedUsdt = data.initial_seed_usdt || 106.55;
+
+  // Calculate live floating unrealized PnL from active positions
+  let totalLiveUnrealizedPnl = 0;
+  const openPos = data.active_positions || {};
+  for (const [u, p] of Object.entries(openPos)) {
+    if (!p) continue;
+    const posList = Array.isArray(p) ? p : [p];
+    for (const item of posList) {
+      if (!item) continue;
+      const sym = (item.pair || '').toUpperCase();
+      const currP = livePrices[sym] || item.mark_price || item.entry_price || 0;
+      if (currP > 0 && item.entry_price > 0) {
+        const isLong = (item.direction || 'LONG') === 'LONG';
+        const lev = Number(item.leverage || 1);
+        const margin = Number(item.allocated_margin_usdt || 0);
+        const ret = isLong ? (currP - item.entry_price) / item.entry_price : (item.entry_price - currP) / item.entry_price;
+        const uPnl = margin * ret * lev;
+        totalLiveUnrealizedPnl += uPnl;
+      }
+    }
+  }
+
+  const liveTotalWealth = totEq + totalLiveUnrealizedPnl;
+  const netPnlUsdt = liveTotalWealth - initSeedUsdt;
+  const netPnlPct = (netPnlUsdt / initSeedUsdt) * 100;
+  const pnlSign = netPnlUsdt >= 0 ? '+' : '';
+  const pnlColor = netPnlUsdt >= 0 ? '#34d399' : '#f87171';
+  const pnlBg = netPnlUsdt >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+
+  document.getElementById('totalWealth').innerText = fmtUsdt(liveTotalWealth);
+  document.getElementById('totalWealthInr').innerText = 'Equivalent: ' + fmtInr(liveTotalWealth) + ' INR';
+
+  const pnlBadge = document.getElementById('portfolioNetPnlBadge');
+  if (pnlBadge) {
+    pnlBadge.innerText = `${pnlSign}${fmtUsdt(netPnlUsdt)} (${pnlSign}${netPnlPct.toFixed(2)}%)`;
+    pnlBadge.style.color = pnlColor;
+    pnlBadge.style.background = pnlBg;
+  }
+
+  const seedEl = document.getElementById('initialSeedBadge');
+  if (seedEl) {
+    seedEl.innerText = '🌱 Started: ' + fmtUsdt(initSeedUsdt) + ' (' + fmtInr(initSeedUsdt) + ')';
+  }
+  // portfolioEquityBadge removed from header per user preference
+  const elEq = document.getElementById('portfolioEquityBadge');
+  if (elEq) elEq.innerText = fmtUsdt(liveTotalWealth);
+  document.getElementById('activeCapital').innerText = fmtUsdt(actCap);
+  document.getElementById('taxVaultCash').innerText = fmtUsdt(vaultUsdt);
+  document.getElementById('lastUpdateBadge').innerText = 'Updated: ' + (formatShortTime(data.last_update_ist) || 'Just Now');
+
+  // Group A & B
+  const bals = data.active_balances || {};
+  const grpA = (bals.inquisitor || bals.booobsas || 0) + (bals.lazylegendx || bals.lazylegend0_ || 0);
+  const grpB = (bals.akira || 0) + (bals.nicush || 0) + (bals.ka5h || bals.henderson_14 || 0);
+  document.getElementById('grpATotal').innerText = fmtUsdt(grpA) + ' (' + ((grpA / actCap) * 100 || 50).toFixed(1) + '%)';
+  document.getElementById('grpBTotal').innerText = fmtUsdt(grpB) + ' (' + ((grpB / actCap) * 100 || 50).toFixed(1) + '%)';
+
+  // Active Positions
+  const posTable = document.getElementById('openPositionsBody');
+  let openRows = '';
+  let openCount = 0;
+  const activeSymbols = [];
+
+  for (const [u, p] of Object.entries(openPos)) {
+    if (!p) continue;
+    const posList = Array.isArray(p) ? p : [p];
+    for (const item of posList) {
+      if (!item) continue;
+      openCount++;
+      activeSymbols.push(item.pair);
+      const currP = livePrices[item.pair] || item.mark_price || 0;
+      let pnlBadge = `<span class="badge badge-green"><span class="live-dot"></span> Holding</span>`;
+      if (currP > 0 && item.entry_price > 0) {
+        const lev = Number(item.leverage || 1.0);
+        let ret = item.direction === 'SHORT' ? (item.entry_price - currP) / item.entry_price : (currP - item.entry_price) / item.entry_price;
+        const roi = ret * lev * 100.0;
+        const color = roi >= 0 ? '#059669' : '#dc2626';
+        const bg = roi >= 0 ? '#ecfdf5' : '#fef2f2';
+        const border = roi >= 0 ? '#a7f3d0' : '#fecaca';
+        const sign = roi >= 0 ? '+' : '';
+        const priceFmt = currP >= 10 ? currP.toFixed(2) : currP.toFixed(4);
+        pnlBadge = `<span class="badge" style="background:${bg}; color:${color}; border:1px solid ${border};"><span class="live-dot" style="background:${color};"></span> ${sign}${roi.toFixed(2)}% ($${priceFmt})</span>`;
+      } else if (item.roi_pct !== undefined) {
+        const roi = Number(item.roi_pct);
+        const color = roi >= 0 ? '#059669' : '#dc2626';
+        const bg = roi >= 0 ? '#ecfdf5' : '#fef2f2';
+        const border = roi >= 0 ? '#a7f3d0' : '#fecaca';
+        const sign = roi >= 0 ? '+' : '';
+        pnlBadge = `<span class="badge" style="background:${bg}; color:${color}; border:1px solid ${border};"><span class="live-dot" style="background:${color};"></span> ${sign}${roi.toFixed(2)}%</span>`;
+      }
+      const entryTimeFormatted = formatShortTime(item.entry_ist || (item.entry_epoch ? new Date(item.entry_epoch * 1000).toLocaleString() : ''));
+      const holdingTimeFormatted = formatHoldingDuration(item.entry_epoch, item.entry_ist);
+
+      openRows += `
+        <tr>
+          <td style="font-weight:700; color:#111827;">` + getTraderDisplayName(u) + `</td>
+          <td style="font-weight:700; color:#2563eb;">` + item.pair + `</td>
+          <td><span class="badge badge-green">` + item.direction + ` ` + Math.round(item.leverage || 1) + `x</span></td>
+          <td style="font-family:'JetBrains Mono'; font-weight:700;">` + fmtUsdt(item.allocated_margin_usdt) + `</td>
+          <td style="font-family:'JetBrains Mono';">` + item.executed_qty + `</td>
+          <td style="font-family:'JetBrains Mono';">$` + Number(item.entry_price).toFixed(4) + `</td>
+          <td style="font-size:12px; color:#4b5563; white-space:nowrap;">` + entryTimeFormatted + `</td>
+          <td style="font-size:12px; font-weight:700; color:#1f2937; white-space:nowrap; font-family:'JetBrains Mono';">` + holdingTimeFormatted + `</td>
+          <td style="font-family:'JetBrains Mono';">
+            <div>$` + Number(item.trader_sl_price || item.sl_floor_price).toFixed(4) + `</div>
+            <div style="font-size:10px; color:${item.trader_sl_price ? '#f59e0b' : '#dc2626'}; font-weight:600;">
+              ${item.trader_sl_price ? 'Trader SL' : '-85% Floor'}
+            </div>
+            ${item.trader_tp_price ? `<div style="font-size:10px; color:#10b981; font-weight:600;">TP: $${Number(item.trader_tp_price).toFixed(4)}</div>` : ''}
+          </td>
+          <td style="font-family:'JetBrains Mono'; font-size:11px;">` + item.entry_order_id + `</td>
+          <td>` + pnlBadge + `</td>
+        </tr>
+      `;
+    }
+  }
+  if (activeSymbols.length > 0) {
+    updateLiveTickerPrices(activeSymbols).then(() => {
+      // Re-trigger render with updated live prices if state is cached
+      // without re-fetching state to give instant live ticker fluidity
+    });
+  }
+  document.getElementById('openCountBadge').innerText = openCount + ' Open';
+  posTable.innerHTML = openRows || '<tr><td colspan="11" style="text-align:center; color:#9ca3af; padding:20px;">No open positions right now. Listening for signals...</td></tr>';
+
+  // Traders Table
+  const trBody = document.getElementById('tradersBody');
+  const traders = [
+    { u: 'inquisitor', rawKey: 'booobsas', grp: 'Group A (Scalper)' },
+    { u: 'lazylegendx', rawKey: 'lazylegend0_', grp: 'Group A (Scalper)' },
+    { u: 'akira', rawKey: 'akira', grp: 'Group B (Swing)' },
+    { u: 'nicush', rawKey: 'nicush', grp: 'Group B (Swing)' },
+    { u: 'ka5h', rawKey: 'henderson_14', grp: 'Group B (Swing)' },
+  ];
+  let trRows = '';
+  traders.forEach(t => {
+    const b = bals[t.u] !== undefined ? bals[t.u] : (bals[t.rawKey] || 0);
+    const st = (data.stats && (data.stats[t.u] || data.stats[t.rawKey])) || { trades: 0, wins: 0, losses: 0, pnl_usdt: 0, tax_usdt: 0 };
+    const pnlVal = st.pnl_usdt !== undefined ? Number(st.pnl_usdt) : 0;
+    const pnlColor = pnlVal >= 0 ? '#059669' : '#dc2626';
+    const pnlSign = pnlVal >= 0 ? '+' : '';
+
+    // Calculate Net PnL percentage based on historical margin deployed by this trader
+    const traderTrades = (data.trade_history || []).filter(h => h.username === t.u || h.username === t.rawKey);
+    const traderMargin = traderTrades.reduce((acc, h) => acc + (Number(h.margin_spent) || 0), 0);
+    const roiPct = traderMargin > 0 ? (pnlVal / traderMargin * 100) : 0;
+    const roiSign = roiPct >= 0 ? '+' : '';
+    const pnlDisplay = traderMargin > 0
+      ? `${roiSign}${roiPct.toFixed(2)}% <span style="font-size:11px; opacity:0.85;">(${pnlSign}${fmtUsdt(pnlVal)})</span>`
+      : `${pnlSign}${fmtUsdt(pnlVal)}`;
+
+    trRows += `
+      <tr>
+        <td style="font-weight:700; color:#111827;">@` + t.u + `</td>
+        <td style="color:#64748b;">` + t.grp + `</td>
+        <td style="font-weight:700; color:#111827; font-family:'JetBrains Mono';">` + fmtUsdt(b) + `</td>
+        <td style="color:#64748b; font-family:'JetBrains Mono';">` + fmtInr(b) + `</td>
+        <td style="font-family:'JetBrains Mono';">` + st.trades + `</td>
+        <td style="font-family:'JetBrains Mono';">` + st.wins + `W / ` + st.losses + `L</td>
+        <td style="font-weight:700; color:` + pnlColor + `; font-family:'JetBrains Mono';">` + pnlDisplay + `</td>
+        <td style="font-weight:700; color:#dc2626; font-family:'JetBrains Mono';">` + fmtUsdt(st.tax_usdt) + `</td>
+      </tr>
+    `;
+  });
+  trBody.innerHTML = trRows;
+
+  // History Table
+  const histBody = document.getElementById('tradeHistoryBody');
+  const hist = (data.trade_history || []).slice().reverse();
+  let histRows = '';
+  hist.forEach(h => {
+    const pnlColor = h.net_pnl_usdt >= 0 ? '#059669' : '#dc2626';
+    const pnlSign = h.net_pnl_usdt >= 0 ? '+' : '';
+    const roiVal = h.roi_pct !== undefined ? Number(h.roi_pct) : (h.margin_spent > 0 ? (h.net_pnl_usdt / h.margin_spent * 100) : 0);
+    const roiSign = roiVal >= 0 ? '+' : '';
+    const exitTimeShort = formatShortTime(h.time_ist || h.exit_ist);
+    const entryTimeShort = h.entry_ist ? formatShortTime(h.entry_ist) : '';
+    const entrySub = entryTimeShort ? `<div style="font-size:10px; color:#94a3b8; margin-top:2px;">In: ${entryTimeShort}</div>` : '';
+    const dirBadge = h.direction ? `<span style="font-size:10px; font-weight:700; margin-left:4px; color:${h.direction === 'SHORT' ? '#dc2626' : '#059669'};">${h.direction}</span>` : '';
+    histRows += `
+      <tr>
+        <td class="col-time" style="color:#64748b; font-size:11px;">${exitTimeShort}${entrySub}</td>
+        <td style="font-weight:700;">` + getTraderDisplayName(h.username) + `</td>
+        <td style="font-weight:700; color:#2563eb;">` + h.pair + dirBadge + `</td>
+        <td style="font-family:'JetBrains Mono';">` + fmtUsdt(h.margin_spent) + `</td>
+        <td style="font-family:'JetBrains Mono';">$` + Number(h.entry_price).toFixed(4) + `</td>
+        <td style="font-family:'JetBrains Mono';">$` + Number(h.exit_price).toFixed(4) + `</td>
+        <td style="font-weight:700; color:` + pnlColor + `; font-family:'JetBrains Mono';">` + roiSign + roiVal.toFixed(2) + `% <span style="font-size:11px; opacity:0.85;">(` + pnlSign + fmtUsdt(h.net_pnl_usdt) + `)</span></td>
+        <td style="font-weight:700; color:#dc2626; font-family:'JetBrains Mono';">` + (h.tax_skim_usdt > 0 ? '+' + fmtUsdt(h.tax_skim_usdt) : '$0.00') + `</td>
+        <td class="col-reason"><span class="badge badge-amber" style="white-space:nowrap; font-size:11px;">` + h.exit_reason + `</span></td>
+      </tr>
+    `;
+  });
+  window.currentTrades = data.trade_history || [];
+  histBody.innerHTML = histRows || '<tr><td colspan="9" style="text-align:center; color:#9ca3af; padding:20px;">No trades closed yet.</td></tr>';
+}
+
+function downloadTradesCSV() {
+  const trades = window.currentTrades || [];
+  if (trades.length === 0) {
+    alert("No closed trades recorded yet to export.");
+    return;
+  }
+  const headers = [
+    "Timestamp_IST",
+    "Trader",
+    "Pair",
+    "Direction",
+    "Margin_Spent_USDT",
+    "Entry_Price",
+    "Exit_Price",
+    "Quote_Received_USDT",
+    "Net_PnL_USDT",
+    "ROI_Pct",
+    "Safe_30Pct_Tax_Skim_USDT",
+    "Exit_Reason",
+    "Binance_Sell_Order_ID"
+  ];
+
+  const rows = trades.map(t => {
+    const margin = Number(t.margin_spent || 0);
+    const pnl = Number(t.net_pnl_usdt || 0);
+    const roi = t.roi_pct !== undefined ? t.roi_pct : ((pnl / (margin || 1)) * 100).toFixed(2);
+    return [
+      `"${t.time_ist || ''}"`,
+      `"${t.username || ''}"`,
+      `"${t.pair || ''}"`,
+      `"${t.direction || 'LONG'}"`,
+      margin.toFixed(4),
+      Number(t.entry_price || 0).toFixed(4),
+      Number(t.exit_price || 0).toFixed(4),
+      Number(t.quote_received || 0).toFixed(4),
+      pnl.toFixed(4),
+      roi + '%',
+      Number(t.tax_skim_usdt || 0).toFixed(4),
+      `"${(t.exit_reason || '').replace(/"/g, '""')}"`,
+      `"${t.sell_order_id || ''}"`
+    ];
+  });
+
+  const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  a.href = url;
+  a.download = `invo_pool5_trades_${dateStr}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function downloadTradesJSON() {
+  const trades = window.currentTrades || [];
+  if (trades.length === 0) {
+    alert("No closed trades recorded yet to export.");
+    return;
+  }
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trades, null, 2));
+  const a = document.createElement('a');
+  a.href = dataStr;
+  a.download = `invo_pool5_trades_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Initial fetch & poll every 3 seconds
+fetchStats();
+setInterval(fetchStats, 3000);
+</script>
+
+</body>
+</html>
+
