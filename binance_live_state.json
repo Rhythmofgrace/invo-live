@@ -3,11 +3,11 @@
   "reset_epoch": 1794538500,
   "initial_seed_usdt": 106.55,
   "initial_seed_inr": 10000.0,
-  "last_update_ist": "2026-11-14 10:55:59 PM IST",
-  "last_update_epoch": 1794677159.1560967,
+  "last_update_ist": "2026-11-14 10:59:09 PM IST",
+  "last_update_epoch": 1794677349.2990704,
   "last_rebalance_epoch": 1794538529.1567123,
-  "total_portfolio_equity": 111.82024698358511,
-  "total_active_trading_capital": 94.20142446991736,
+  "total_portfolio_equity": 111.69569342469055,
+  "total_active_trading_capital": 103.66611200308552,
   "tax_vault_usdt": 8.02958142160503,
   "tax_vault_inr": 757.1092322431383,
   "usdt_inr_rate": 94.29,
@@ -15,36 +15,14 @@
     "limpan96": 26.6375,
     "akira": 13.429174227174125,
     "prateek": 17.758333333333333,
-    "inquisitor": 11.720183556965544,
+    "inquisitor": 21.184871090133704,
     "ka5h": 24.65623335244436
   },
   "active_positions": {
     "akira": [],
     "nicush": [],
     "ka5h": [],
-    "inquisitor": [
-      {
-        "ticker": "XTEN",
-        "pair": "BTCUSDT",
-        "direction": "SHORT",
-        "leverage": 3.0,
-        "allocated_margin_usdt": 9.589241092062718,
-        "untraded_cash_usdt": 11.720183556965544,
-        "executed_qty": 0.00043980955788055484,
-        "entry_price": 65412.7,
-        "entry_order_id": "28679990388",
-        "entry_epoch": 1794675522.6311743,
-        "entry_ist": "2026-11-14 10:28:42 PM IST",
-        "sl_floor_price": 83946.29833333332,
-        "trader_sl_price": null,
-        "trader_tp_price": null,
-        "invo_entry_size": 1.4996918715572085,
-        "invo_entry_price": 0.21243,
-        "loans": [],
-        "mark_price": 65583.8,
-        "roi_pct": -0.78
-      }
-    ],
+    "inquisitor": [],
     "lazylegendx": []
   },
   "stats": {
@@ -70,10 +48,10 @@
       "tax_usdt": 0.0
     },
     "inquisitor": {
-      "trades": 15,
+      "trades": 16,
       "wins": 10,
-      "losses": 5,
-      "pnl_usdt": -1.67275008631219,
+      "losses": 6,
+      "pnl_usdt": -1.79730364520675,
       "tax_usdt": 3.655325264659541
     },
     "ka5h": {
@@ -746,6 +724,30 @@
       "entry_ist": "2026-11-14 06:57:20 PM IST",
       "exit_ist": "2026-11-14 07:03:54 PM IST",
       "time_ist": "2026-11-14 07:03:54 PM IST"
+    },
+    {
+      "username": "inquisitor",
+      "pair": "BTCUSDT",
+      "direction": "SHORT",
+      "entry_price": 65412.7,
+      "exit_price": 65630.5,
+      "margin_spent": 9.589241092062718,
+      "quote_received": 9.464687533168158,
+      "gross_pnl_usdt": -0.09578583561837173,
+      "fee_usdt": 0.028767723276188154,
+      "net_pnl_usdt": -0.12455355889455988,
+      "roi_pct": -1.3,
+      "tax_skim_usdt": 0.0,
+      "reinvested_usdt": 0.0,
+      "exit_reason": "Invo Trader Closed",
+      "entry_order_id": "28679990388",
+      "sell_order_id": "28680025078",
+      "tax_vault_after_usdt": 8.02958142160503,
+      "trader_balance_after_usdt": 21.184871090133704,
+      "portfolio_equity_after_usdt": 111.69569342469055,
+      "entry_ist": "2026-11-14 10:28:42 PM IST",
+      "exit_ist": "2026-11-14 10:59:09 PM IST",
+      "time_ist": "2026-11-14 10:59:09 PM IST"
     }
   ],
   "notifications": [
