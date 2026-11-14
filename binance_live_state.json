@@ -3,8 +3,8 @@
   "reset_epoch": 1794538500,
   "initial_seed_usdt": 106.55,
   "initial_seed_inr": 10000.0,
-  "last_update_ist": "2026-11-14 10:33:09 PM IST",
-  "last_update_epoch": 1794675789.254931,
+  "last_update_ist": "2026-11-14 10:40:44 PM IST",
+  "last_update_epoch": 1794676244.030573,
   "last_rebalance_epoch": 1794538529.1567123,
   "total_portfolio_equity": 111.82024698358511,
   "total_active_trading_capital": 94.20142446991736,
@@ -41,8 +41,8 @@
         "invo_entry_size": 1.4996918715572085,
         "invo_entry_price": 0.21243,
         "loans": [],
-        "mark_price": 65180.1,
-        "roi_pct": 1.07
+        "mark_price": 65137.8,
+        "roi_pct": 1.26
       }
     ],
     "lazylegendx": []
